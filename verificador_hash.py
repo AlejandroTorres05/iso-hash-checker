@@ -40,3 +40,45 @@ class DropFrame(tk.Frame):
         self.configure(bg='lightgray')
         self.label.configure(bg='lightgray')
 
+    def on_drop(self, event):
+        """Manejar archivos soltados"""
+        file_path = event.data
+        # Limpiar la ruta (tkdnd puede agregar {} o espacios extra)
+        if file_path.startswith('{') and file_path.endswith('}'):
+            file_path = file_path[1:-1]
+        file_path = file_path.strip()
+        
+        self.set_file(file_path)
+        self.configure(bg='lightgreen')
+        self.label.configure(bg='lightgreen')
+    
+    def on_click(self, event):
+        """Permitir seleccionar archivo haciendo click"""
+        filetypes = []
+        if '.iso' in str(self.file_types).lower():
+            filetypes.append(("Archivos ISO", "*.iso"))
+        if 'hash' in str(self.file_types).lower():
+            filetypes.extend([("Archivos de Hash", "*.txt"), ("SHA256SUMS", "*SUMS*")])
+        filetypes.append(("Todos los archivos", "*.*"))
+        
+        file_path = filedialog.askopenfilename(filetypes=filetypes)
+        if file_path:
+            self.set_file(file_path)
+    
+    def set_file(self, file_path):
+        """Establecer archivo seleccionado"""
+        self.file_path = file_path
+        filename = os.path.basename(file_path)
+        self.label.configure(text=f"✓ {filename}\n\n{file_path}")
+        self.configure(bg='lightgreen')
+        self.label.configure(bg='lightgreen')
+
+    def get_file_path(self):
+        """Obtener ruta del archivo seleccionado"""
+        return self.file_path
+    
+    def reset(self):
+        """Resetear el frame"""
+        self.file_path = ""
+        self.configure(bg='lightgray')
+        self.label.configure(bg='lightgray')
